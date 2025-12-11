@@ -1,23 +1,21 @@
-// The Curried Function
-const addClassOnEvent = (className) => (event) => (element) => {
-  element.addEventListener(event, () => {
-    element.classList.toggle(className);
-    console.log(`Class '${className}' toggled on ${event} event.`);
-  });
-};
+var a = document.getElementById("input").value = []
 
-// --- Partial Application Step 1: Fix the class name ---
-// Create a specialized utility to highlight any element
-const highlightElement = addClassOnEvent('highlight'); 
-jjjjjjj
-// --- Partial Application Step 2: Fix the event type (click) ---
-// Create a more specialized utility to highlight on click
-const highlightOnClick = highlightElement('click');
+CalculatorFofX = function () {
 
-// --- Final Application ---
-// Get an element (assuming you have a button with id="myButton")
-const button = document.getElementById('myButton');
+    add = function() {
+        a.push("+")
+    }
 
-// 4. Apply the final argument (the element)
-highlightOnClick(button); 
-// Now, every time 'myButton' is clicked, the 'highlight' class is added.
+    num1 = function() {
+        a.push("1")
+    }
+
+    num2 = function() {
+        a.push("2")
+    }
+
+    enter = function(...a) {
+        return arguments  
+    }
+}
+
