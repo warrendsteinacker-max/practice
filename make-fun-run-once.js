@@ -161,20 +161,7 @@ const Chaining = function(a) {
         else {
             c = b
         }
-        
-        return function(c) {
-            // This closure encapsulates 'a', 'b', and 'c'
-            
-            return function(d) {
-                // The final function executes the logic using all captured variables
-                return a + b + c + d;
-            };
-        };
     };
 };
 
 // --- Execution (The Chaining) ---
-
-const finalResult = adder(1)(2)(3)(4); // Passes one argument at a time
-
-console.log(finalResult); // Output: 10 (1 + 2 + 3 + 4)
