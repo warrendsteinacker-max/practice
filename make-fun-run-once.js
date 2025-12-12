@@ -103,3 +103,78 @@ function handleButtonClick(clickedElement) {
     // For demonstration: change the color
     clickedElement.style.backgroundColor = 'lightblue';
 }
+
+
+
+// The corrected function that takes one argument at a time
+const adder = function(a) {
+    // Outer function's scope encapsulates 'a'
+    
+    return function(b) {
+        // This closure encapsulates 'a' and 'b'
+        
+        return function(c) {
+            // This closure encapsulates 'a', 'b', and 'c'
+            
+            return function(d) {
+                // The final function executes the logic using all captured variables
+                return a + b + c + d;
+            };
+        };
+    };
+};
+
+// --- Execution (The Chaining) ---
+
+const finalResult = adder(1)(2)(3)(4); // Passes one argument at a time
+
+console.log(finalResult); // Output: 10 (1 + 2 + 3 + 4)
+
+
+
+// The corrected function that takes one argument at a time
+
+a = document.getElementById('valueInput').value;    
+
+const Chaining = function(a) {
+    const checkbox = document.getElementById('square');
+    
+    // 2. Read the checked property (it returns true or false)
+    const isChecked = checkbox.checked;
+    // Outer function's scope encapsulates 'a'
+    if (isChecked) {
+        a = a * a;
+        b = a
+    }
+    else {
+        b = a
+    }
+    return function(b) {
+        const checkbox2 = document.getElementById('double');
+    
+    // 2. Read the checked property (it returns true or false)
+        const isChecked2 = checkbox2.checked;
+        // This closure encapsulates 'a' and 'b'
+        if (isChecked2) {
+            c = b + b;
+        }
+        else {
+            c = b
+        }
+        
+        return function(c) {
+            // This closure encapsulates 'a', 'b', and 'c'
+            
+            return function(d) {
+                // The final function executes the logic using all captured variables
+                return a + b + c + d;
+            };
+        };
+    };
+};
+
+// --- Execution (The Chaining) ---
+
+const finalResult = adder(1)(2)(3)(4); // Passes one argument at a time
+
+console.log(finalResult); // Output: 10 (1 + 2 + 3 + 4)
