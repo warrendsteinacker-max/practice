@@ -1,46 +1,105 @@
-<!DOCTYPE html>     
-<html lang="en"></html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendar</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Functional JavaScript Calculator</title>
+    <script src="calc.js" defer></script> 
+    
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 70px); /* 4 columns of equal width */
+            grid-template-rows: minmax(80px, auto) repeat(5, 70px); /* Display row and 5 button rows */
+            gap: 1px;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 10px;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* The Display Screen */
+        #display {
+            grid-column: 1 / -1; /* Span all four columns */
+            background-color: #222;
+            color: white;
+            padding: 10px 15px;
+            font-size: 2.5em;
+            text-align: right;
+            border: none;
+            overflow: hidden;
+            pointer-events: none; /* Prevents users from typing into it */
+        }
+        
+        /* General Button Styles */
+        .calculator-grid button {
+            cursor: pointer;
+            font-size: 1.2em;
+            border: 1px solid #999;
+            background-color: #f0f0f0;
+            outline: none;
+        }
+        .calculator-grid button:hover {
+            background-color: #ddd;
+        }
+
+        /* Operator and Special Buttons */
+        .operator {
+            background-color: #ff9500;
+            color: rgb(116, 22, 22);
+        }
+        .operator:hover {
+            background-color: #cc7b00;
+        }
+        
+        /* Full Clear Button */
+        .clear {
+            grid-column: span 2;
+            background-color: #d8d8d8;
+        }
+        .equals {
+            grid-column: span 2; /* Make the equals button span two columns */
+            background-color: #004d99;
+            color: white;
+        }
+    </style>
 </head>
 <body>
 
-<script>
-class Calculator {
-    constructor(inputId) {
-        this.inputElement = document.getElementById(inputId);
-    }
+    <div class="calculator-grid">
+        <input type="text" id="display" value="0" readonly> 
 
-    add1() {
-        let currentValue = parseInt(this.inputElement.value) || 0;
-        this.inputElement.value = currentValue + 1;
-    }
+        <button onclick="calculator.clear()" class="clear">AC</button>
+        <button onclick="calculator.inputOperator('/')" class="operator">/</button>
+        <button onclick="calculator.inputOperator('*')" class="operator">*</button>
 
-    sub1() {
-        let currentValue = parseInt(this.inputElement.value) || 0;
-        this.inputElement.value = currentValue - 1;
-    }
-}
-</script>
-    
-<input type="text" id="input" value="0">
+        <button onclick="calculator.inputNumber(7)">7</button>
+        <button onclick="calculator.inputNumber(8)">8</button>
+        <button onclick="calculator.inputNumber(9)">9</button>
+        <button onclick="calculator.inputOperator('-')" class="operator">-</button>
 
+        <button onclick="calculator.inputNumber(4)">4</button>
+        <button onclick="calculator.inputNumber(5)">5</button>
+        <button onclick="calculator.inputNumber(6)">6</button>
+        <button onclick="calculator.inputOperator('+')" class="operator">+</button>
 
-<button onclick="    function() {
-        let currentValue = parseInt(this.inputElement.value) || 0;
-        this.inputElement.value = currentValue + 1;
-    }">Add 1</button>
-<button onclick="sub1()">Sub 1</button>
+        <button onclick="calculator.inputNumber(1)">1</button>
+        <button onclick="calculator.inputNumber(2)">2</button>
+        <button onclick="calculator.inputNumber(3)">3</button>
 
+        <button onclick="calculator.inputNumber(0)">0</button>
+        <button onclick="calculator.inputDecimal()">.</button>
+        
+        <button onclick="calculator.calculate()" class="equals">=</button>
+    </div>
 
-
-
-
-</body>>
-
-
-
+</body>
 </html>
