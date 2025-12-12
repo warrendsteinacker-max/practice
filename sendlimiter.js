@@ -1,84 +1,98 @@
-/**
- * Factory function that wraps another function (fn) and provides a way to execute it once,
- * plus a public method to reset its 'hasRun' state.
- *
- * @param {Function} fn The function to be limited.
- * @returns {Object} An object containing the limited function and a reset method.
- */
+// --- 1. The Wrapper Factory (Modified for Reset) ---
+// This is the core 'once' logic that exposes a reset method.
 function createOnceWrapper(fn) {
-    // PRIVATE STATE (The Closure Context)
     let hasRun = false;
     let result;
     
-    // The limited function (The actual click handler)
     const limitedFunction = function(...args) {
         if (!hasRun) {
-            console.log("--- LIMITED: Running original function ---");
-            // Use apply() to pass the clicked element ('this') and arguments
+            console.log("--- LIMITED: Executing action ---");
             result = fn.apply(this, args); 
             hasRun = true;
         } else {
-            console.log("--- LIMITED: Skipped execution (already run) ---");
+            console.log("--- LIMITED: Execution skipped (already run) ---");
         }
         return result;
     };
     
-    // The reset function (exposed publicly)
-    const resetFunction = () => {
+    // Public method to reset the state
+    const resetState = () => {
         hasRun = false;
         result = undefined;
-        console.log("--- RESET: Limited function state has been reset. ---");
+        console.log("--- RESET: Limited state cleared. ---");
     };
 
-    // Return the public interface
     return {
-        // The function the button will call
         handler: limitedFunction,
-        // The function the reset button will call
-        reset: resetFunction
+        reset: resetState,
+        // Also expose the original function for the "Unlimited" mode
+        originalFn: fn
     };
 }
 
 
-// --- 2. The Original Handler Function ---
-// This function will be wrapped and limited.
-function handleButtonClick(clickedElement) {
-    // 1. Access the element's ID
-    const buttonId = clickedElement.id; 
+// --- 2. The Original Handler Function (The Core Logic) ---
+// This is the function whose execution we want to limit.
+function updateDisplay(event) {
+    // Prevent default form submission if applicable
+    if (event && event.preventDefault) {
+        event.preventDefault();
+    }
     
-    // 2. Modify the element's content 
-    clickedElement.textContent = "Clicked! (Limited)";
+    const inputElement = document.getElementById('valueInput');
+    const paragraphElement = document.getElementById('outputParagraph');
     
-    console.log(`Button ID: ${buttonId}`);
+    const newValue = inputElement.value || "(No Value)";
     
-    // 3. For demonstration: change the color
-    clickedElement.style.backgroundColor = 'salmon';
+    paragraphElement.textContent = `Current Value: ${newValue} (Updated @ ${new Date().toLocaleTimeString()})`;
+    
+    // Provide visual feedback on the button itself
+    this.style.backgroundColor = 'lightgreen';
+    this.textContent = 'Submitted!';
+    
+    console.log(`Action executed. New value: ${newValue}`);
 }
 
 
-// --- 3. Setup and Binding ---
+// --- 3. Setup and Toggling Logic ---
+let isLimited = true; // Start in limited mode
 
 // Create the wrapper instance once
-const limitedHandlerInstance = createOnceWrapper(handleButtonClick);
+const limiter = createOnceWrapper(updateDisplay);
 
-// Assign the 'handler' method to the global scope for the HTML onclick
-const buttonHandler = limitedHandlerInstance.handler;
-const resetHandler = limitedHandlerInstance.reset;
+document.addEventListener('DOMContentLoaded', () => {
+    const submitButton = document.getElementById('submitButton');
+    const toggleButton = document.getElementById('toggleButton');
 
-// We also need a way to pass the element in the HTML
-// The 'buttonHandler' must be wrapped in another function to pass 'this' from HTML:
-function wrapHandler(clickedElement) {
-    // Call the limited handler, making sure 'this' refers to 'clickedElement'
-    limitedHandlerInstance.handler.call(clickedElement, clickedElement);
-}
+    // Initial setup: Attach the limited handler
+    submitButton.addEventListener('click', limiter.handler);
+    
+    // Set initial text for the toggle button
+    toggleButton.textContent = 'Mode: LIMITED (Click to switch)';
 
-// Function to attach the reset button's logic (optional, but cleaner)
-function resetState() {
-    resetHandler();
-    // Reset the appearance of the limited button
-    const limitedButton = document.getElementById('limited-button');
-    if (limitedButton) {
-        limitedButton.textContent = 'Limited Button (Click Once!)';
-        limitedButton.style.backgroundColor = '';
-    }
-}
+
+    // Function to handle the mode toggle
+    toggleButton.addEventListener('click', () => {
+        // 1. Remove the existing handler
+        submitButton.removeEventListener('click', isLimited ? limiter.handler : limiter.originalFn);
+
+        // 2. Toggle the state
+        isLimited = !isLimited;
+        
+        // 3. Reset the limiter state and visual feedback
+        limiter.reset();
+        submitButton.style.backgroundColor = '';
+        submitButton.textContent = 'Submit Value';
+
+        // 4. Attach the NEW handler
+        if (isLimited) {
+            submitButton.addEventListener('click', limiter.handler);
+            toggleButton.textContent = 'Mode: LIMITED (Click to switch)';
+            console.log("--- Switched to LIMITED Mode ---");
+        } else {
+            submitButton.addEventListener('click', limiter.originalFn);
+            toggleButton.textContent = 'Mode: UNLIMITED (Click to switch)';
+            console.log("--- Switched to UNLIMITED Mode ---");
+        }
+    });
+});

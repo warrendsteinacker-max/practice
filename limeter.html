@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Once Logic with Toggling</title>
+    <style>
+        body { font-family: sans-serif; padding: 30px; }
+        #controls { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        #outputParagraph { margin-top: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 4px; font-weight: bold; }
+        button { padding: 10px 15px; margin-right: 10px; cursor: pointer; border: 1px solid #000; border-radius: 4px; }
+        #toggleButton { background-color: #007bff; color: white; }
+        #submitButton { background-color: #f0f0f0; }
+        input[type="text"] { padding: 8px; font-size: 1em; border: 1px solid #ccc; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <h2>'Once' Function Toggler Demo</h2>
+
+    <div id="controls">
+        <label for="valueInput">Enter Value:</label>
+        <input type="text" id="valueInput" value="Test Data" placeholder="Type something...">
+        
+        <br><br>
+
+        <button id="submitButton">Submit Value</button>
+
+        <button id="toggleButton"></button>
+    </div>
+
+    <p id="outputParagraph">Current Value: (Not yet submitted)</p>
+    
+    <p>💡 **Instructions:** Open your browser's Console (F12) to see execution logs.</p>
+
+    <script>
+        // PASTE THE ENTIRE JAVASCRIPT BLOCK FROM SECTION 1 HERE
+        // ... (The createOnceWrapper function, updateDisplay function, and event listeners) ...
+        
+        // --- 1. The Wrapper Factory (Modified for Reset) ---
+        function createOnceWrapper(fn) {
+            let hasRun = false;
+            let result;
+            
+            const limitedFunction = function(...args) {
+                if (!hasRun) {
+                    console.log("--- LIMITED: Executing action ---");
+                    result = fn.apply(this, args); 
+                    hasRun = true;
+                } else {
+                    console.log("--- LIMITED: Execution skipped (already run) ---");
+                }
+                return result;
+            };
+            
+            const resetState = () => {
+                hasRun = false;
+                result = undefined;
+                console.log("--- RESET: Limited state cleared. ---");
+            };
+
+            return {
+                handler: limitedFunction,
+                reset: resetState,
+                originalFn: fn
+            };
+        }
+
+
+        // --- 2. The Original Handler Function (The Core Logic) ---
+        function updateDisplay(event) {
+            if (event && event.preventDefault) {
+                event.preventDefault();
+            }
+            
+            const inputElement = document.getElementById('valueInput');
+            const paragraphElement = document.getElementById('outputParagraph');
+            
+            const newValue = inputElement.value || "(No Value)";
+            
+            paragraphElement.textContent = `Current Value: ${newValue} (Updated @ ${new Date().toLocaleTimeString()})`;
+            
+            this.style.backgroundColor = 'lightgreen';
+            this.textContent = 'Submitted!';
+            
+            console.log(`Action executed. New value: ${newValue}`);
+        }
+
+
+        // --- 3. Setup and Toggling Logic ---
+        let isLimited = true; 
+
+        const limiter = createOnceWrapper(updateDisplay);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const submitButton = document.getElementById('submitButton');
+            const toggleButton = document.getElementById('toggleButton');
+
+            // Initial setup: Attach the limited handler
+            submitButton.addEventListener('click', limiter.handler);
+            
+            toggleButton.textContent = 'Mode: LIMITED (Click to switch)';
+
+
+            // Function to handle the mode toggle
+            toggleButton.addEventListener('click', () => {
+                // 1. Remove the existing handler
+                submitButton.removeEventListener('click', isLimited ? limiter.handler : limiter.originalFn);
+
+                // 2. Toggle the state
+                isLimited = !isLimited;
+                
+                // 3. Reset the limiter state and visual feedback
+                limiter.reset();
+                submitButton.style.backgroundColor = '';
+                submitButton.textContent = 'Submit Value';
+
+                // 4. Attach the NEW handler
+                if (isLimited) {
+                    submitButton.addEventListener('click', limiter.handler);
+                    toggleButton.textContent = 'Mode: LIMITED (Click to switch)';
+                    console.log("--- Switched to LIMITED Mode ---");
+                } else {
+                    submitButton.addEventListener('click', limiter.originalFn);
+                    toggleButton.textContent = 'Mode: UNLIMITED (Click to switch)';
+                    console.log("--- Switched to UNLIMITED Mode ---");
+                }
+            });
+        });
+    </script>
+</body>
+</html>
